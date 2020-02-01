@@ -39,7 +39,8 @@ server.use((req, res, next) => {
 });
 
 function checkProjectInArray(req, res, next) {
-	const project = projects[req.params.id];
+	const { id } = req.params;
+	const project = projects.find(p => p.id === id);
 	if (!project) {
 		return res.status(400).json({ error: "Project does not Exists" });
 	}
@@ -59,8 +60,10 @@ server.post("/projects/:id/tasks", checkProjectInArray, (req, res) => {
 	const { id } = req.params;
 	const { title } = req.body;
 
-	projects[id].task.push(title);
-	return res.json(projects[id]);
+	const project = projects.find(p => p.id == id);
+	project.task.push(title);
+
+	return res.json(project);
 });
 
 server.get("/projects", (req, res) => {
@@ -75,13 +78,18 @@ server.put("/projects/:id", (req, res) => {
 	const { id } = req.params;
 	const { title } = req.body;
 
-	projects[id].title = title;
-	return res.json(projects[id]);
+	const project = projects.find(p => p.id == id);
+
+	project.title = title;
+	return res.json(project);
 });
 
 server.delete("/projects/:id", (req, res) => {
 	const { id } = req.params;
-	projects.splice(id, 1);
+
+	const projectIndex = projects.findIndex(p => p.id === id);
+
+	projects.splice(projectIndex, 1);
 	return res.send();
 });
 
